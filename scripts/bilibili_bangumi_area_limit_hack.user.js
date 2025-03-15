@@ -133,60 +133,6 @@ function scriptSource(invokeBy) {
         }
     });
 
-    const r_text = {
-        ok: { en: 'OK', zh_cn: '确定', },
-        close: { en: 'Close', zh_cn: '关闭' },
-        welcome_to_acfun: '<p><b>缺B乐 了解下？</b></p>',
-        version_remind: ``,
-    };
-    function _t(key) {
-        const text = r_text[key];
-        const lang = 'zh_cn';
-        return typeof text === 'string' ? text : text[lang];
-    }
-    const TRUE = 'Y';
-    const FALSE = '';
-    const r = {
-        html: {},
-        attr: {},
-        url: {
-            issue: 'https://github.com/ipcjs/bilibili-helper/issues',
-            issue_new: 'https://github.com/ipcjs/bilibili-helper/issues/new',
-            readme: 'https://github.com/ipcjs/bilibili-helper/blob/user.js/packages/unblock-area-limit/README.md#%E8%A7%A3%E9%99%A4b%E7%AB%99%E5%8C%BA%E5%9F%9F%E9%99%90%E5%88%B6',
-        },
-        script: {
-            is_dev: GM_info.script.name.includes('.dev'),
-        },
-        const: {
-            mode: {
-                /** 默认模式, 自动判断使用何种模式, 推荐; */
-                DEFAULT: 'default',
-                /** 替换模式, 替换有区域限制的视频的接口的返回值; */
-                REPLACE: 'replace',
-                /** 重定向模式, 直接重定向所有番剧视频的接口到代理服务器; 所有番剧视频都通过代理服务器获取视频地址, 如果代理服务器不稳定, 可能加载不出视频; */
-                REDIRECT: 'redirect',
-            },
-            server: {
-                S0: 'https://biliplus.ipcjs.top',
-                S1: 'https://www.biliplus.com',
-                CUSTOM: '__custom__',
-                defaultServer: function () {
-                    return this.S1;
-                },
-            },
-            TRUE: TRUE,
-            FALSE: FALSE,
-        },
-        regex: {
-            /** api.bilibili.com的全站代理 */
-            bilibili_api_proxy: /^https?:\/\/(?<user_pass>[\p{L}\d:_-]+@)?(?<user_server>[\p{L}\d_-]+(\.[\p{L}\d_-]+)+(:\d+)?)$/u,
-        },
-        baipiao: [
-            { key: 'zomble_land_saga', match: () => (window.__INITIAL_STATE__?.epInfo?.ep_id) === 251255, link: 'http://www.acfun.cn/bangumi/ab5022161_31405_278830', message: r_text.welcome_to_acfun },
-            { key: 'zomble_land_saga', match: () => (window.__INITIAL_STATE__?.mediaInfo?.media_id) === 140772, link: 'http://www.acfun.cn/bangumi/aa5022161', message: r_text.welcome_to_acfun },
-        ]
-    };
-
     var Strings;
     (function (Strings) {
         function multiply(str, multiplier) {
@@ -263,6 +209,11 @@ function scriptSource(invokeBy) {
         Objects.stringifyArray = stringifyArray;
     })(Objects || (Objects = {}));
 
+    var Scripts;
+    (function (Scripts) {
+        Scripts.isDev = GM_info.script.name.includes('.dev');
+    })(Scripts || (Scripts = {}));
+
     const tag = GM_info.script.name + '.msg';
     // 计算"楼层", 若当前window就是顶层的window, 则floor为0, 以此类推
     function computeFloor(w = window, floor = 0) {
@@ -296,7 +247,7 @@ function scriptSource(invokeBy) {
         }
     };
     function logImpl(type) {
-        if (r.script.is_dev) {
+        if (Scripts.isDev) {
             // 直接打印, 会显示行数
             return window.console[type].bind(window.console, type + ':');
         }
@@ -315,10 +266,9 @@ function scriptSource(invokeBy) {
     const util_warn = logImpl('warn');
     const util_error = logImpl('error');
 
+    function noop() { }
     var Func;
     (function (Func) {
-        function noop() { }
-        Func.noop = noop;
         function runCatching(func, onError) {
             let ret = function () {
                 try {
@@ -482,6 +432,60 @@ function scriptSource(invokeBy) {
         }
         return elem;
     }
+
+    const r_text = {
+        ok: { en: 'OK', zh_cn: '确定', },
+        close: { en: 'Close', zh_cn: '关闭' },
+        welcome_to_acfun: '<p><b>缺B乐 了解下？</b></p>',
+        version_remind: ``,
+    };
+    function _t(key) {
+        const text = r_text[key];
+        const lang = 'zh_cn';
+        return typeof text === 'string' ? text : text[lang];
+    }
+    const TRUE = 'Y';
+    const FALSE = '';
+    const r = {
+        html: {},
+        attr: {},
+        url: {
+            issue: 'https://github.com/ipcjs/bilibili-helper/issues',
+            issue_new: 'https://github.com/ipcjs/bilibili-helper/issues/new',
+            readme: 'https://github.com/ipcjs/bilibili-helper/blob/user.js/packages/unblock-area-limit/README.md#%E8%A7%A3%E9%99%A4b%E7%AB%99%E5%8C%BA%E5%9F%9F%E9%99%90%E5%88%B6',
+        },
+        script: {
+            is_dev: Scripts.isDev,
+        },
+        const: {
+            mode: {
+                /** 默认模式, 自动判断使用何种模式, 推荐; */
+                DEFAULT: 'default',
+                /** 替换模式, 替换有区域限制的视频的接口的返回值; */
+                REPLACE: 'replace',
+                /** 重定向模式, 直接重定向所有番剧视频的接口到代理服务器; 所有番剧视频都通过代理服务器获取视频地址, 如果代理服务器不稳定, 可能加载不出视频; */
+                REDIRECT: 'redirect',
+            },
+            server: {
+                S0: 'https://biliplus.ipcjs.top',
+                S1: 'https://www.biliplus.com',
+                CUSTOM: '__custom__',
+                defaultServer: function () {
+                    return this.S1;
+                },
+            },
+            TRUE: TRUE,
+            FALSE: FALSE,
+        },
+        regex: {
+            /** api.bilibili.com的全站代理 */
+            bilibili_api_proxy: /^https?:\/\/(?<user_pass>[\p{L}\d:_-]+@)?(?<user_server>[\p{L}\d_-]+(\.[\p{L}\d_-]+)+(:\d+)?)$/u,
+        },
+        baipiao: [
+            { key: 'zomble_land_saga', match: () => (window.__INITIAL_STATE__?.epInfo?.ep_id) === 251255, link: 'http://www.acfun.cn/bangumi/ab5022161_31405_278830', message: r_text.welcome_to_acfun },
+            { key: 'zomble_land_saga', match: () => (window.__INITIAL_STATE__?.mediaInfo?.media_id) === 140772, link: 'http://www.acfun.cn/bangumi/aa5022161', message: r_text.welcome_to_acfun },
+        ]
+    };
 
     // 继承系统的[Error]在ES5下可能不生效, 使用这个类替代
     // 详见: https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
@@ -1210,7 +1214,6 @@ function scriptSource(invokeBy) {
         clearLoginFlag,
     };
 
-    // @ts-nocheck
     let noReferrerHostArray = [];
     /// 注入Xhr
     ///
@@ -1220,9 +1223,15 @@ function scriptSource(invokeBy) {
     /// [transformResponse]:
     /// {@macro xhr_transform_response}
     function injectXhr({ transformRequest, transformResponse }) {
-        util_debug('XMLHttpRequest的描述符:', Object.getOwnPropertyDescriptor(window, 'XMLHttpRequest'));
+        // util_debug('XMLHttpRequest的描述符:', Object.getOwnPropertyDescriptor(window, 'XMLHttpRequest'))
+        let firstCreateXHR = true;
         window.XMLHttpRequest = new Proxy(window.XMLHttpRequest, {
             construct: function (target, args) {
+                // 第一次创建XHR时, 打上断点...
+                if (firstCreateXHR && Scripts.isDev) {
+                    firstCreateXHR = false;
+                    // debugger
+                }
                 let container = {}; // 用来替换responseText等变量
                 const dispatchResultTransformer = p => {
                     let event = {}; // 伪装的event
@@ -2806,7 +2815,7 @@ function scriptSource(invokeBy) {
         show: function (referenceElement, message, closeTime, boxType, buttonTypeConfirmCallback) {
             ui.alert(message, buttonTypeConfirmCallback);
         },
-        close: Func.noop
+        close: noop
     };
     util_init(() => {
         if (!popMessage && window.MessageBox) {
