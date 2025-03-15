@@ -10,39 +10,11 @@ import { _ } from "../../util/react"
 import { Strings } from "../../util/strings"
 import { ui } from "../../util/ui"
 import { ifNotNull } from "../../util/utils"
+import { Windows } from "../../util/windows"
 import { balh_config, isClosed } from "../config"
 import { util_page } from "../page"
 import pageTemplate from './bangumi-play-page-template.html'
 import { bilibili_login } from "./bilibili_login"
-
-export function modifyGlobalValue<T = any>(
-    name: string,
-    options: {
-        // onWrite可以修改写入的值
-        onWrite: (value: T | undefined) => T | undefined,
-        // onRead可以用来打断点...
-        onRead?: (value: T | undefined) => void
-    },
-) {
-    const _window = window as StringAnyObject
-    const name_origin = `${name}_origin`
-    _window[name_origin] = _window[name]
-    let value: T | undefined = undefined
-    Object.defineProperty(_window, name, {
-        configurable: true,
-        enumerable: true,
-        get: () => {
-            options?.onRead?.(value)
-            return value
-        },
-        set: (val) => {
-            value = options.onWrite(val)
-        }
-    })
-    if (_window[name_origin]) {
-        _window[name] = _window[name_origin]
-    }
-}
 
 let callbackCount = 1000
 function appendScript(
@@ -491,7 +463,7 @@ export function area_limit_for_vue() {
     }
 
     function replaceUserState() {
-        modifyGlobalValue('__PGC_USERSTATE__', {
+        Windows.proxyGlobalField('__PGC_USERSTATE__', {
             onWrite: (value) => {
                 processUserStatus(value)
                 return value
@@ -501,7 +473,7 @@ export function area_limit_for_vue() {
 
     /** 拦截处理新页面的初始数据 */
     function replaceNextData() {
-        modifyGlobalValue('__NEXT_DATA__', {
+        Windows.proxyGlobalField('__NEXT_DATA__', {
             onWrite: (value) => {
                 // 结构变了很多，新版是SSR可能一开始会取不到或者是个dom，无论如何先try一下
                 try {
@@ -550,7 +522,7 @@ export function area_limit_for_vue() {
 
     /** 拦截处理老页面的数据 */
     function replaceInitialState() {
-        modifyGlobalValue('__INITIAL_STATE__', {
+        Windows.proxyGlobalField('__INITIAL_STATE__', {
             onWrite: (value) => {
                 if (value?.epInfo?.id === -1 && value?.epList?.length === 0 && value?.mediaInfo?.rights?.limitNotFound === true) {
                     invalidInitialState = value
@@ -582,7 +554,7 @@ export function area_limit_for_vue() {
     replacePlayInfo()
     fixBangumiPlayPage()
 
-    modifyGlobalValue('BilibiliPlayer', {
+    Windows.proxyGlobalField('BilibiliPlayer', {
         onWrite: (value) => {
             return value
         },

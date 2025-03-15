@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
     "@rollup/plugin-typescript": "^6.1.0",
     "@types/greasemonkey": "^4.0.2",
     "magic-string": "^0.25.7",
@@ -18,10 +19,11 @@
     "rollup-plugin-scss": "^3.0.0",
     "sass": "^1.69.5",
     "tslib": "^2.0.3",
-    "typescript": "^5.3.3"
+    "typescript": "^5.8.2"
   },
   "scripts": {
     "dev:balh": "rollup --config packages/unblock-area-limit/rollup.config.js -w",
+    "dev:bbu": "rollup --config packages/bilibili-block-ugc/rollup.config.js -w",
     "dev:sms": "rollup --config packages/s3_mobile_style/rollup.config.js -w",
     "dev:zmfs": "rollup --config packages/zhihu_mobile_style/rollup.config.js -w",
     "lint:watch": "tsc --noEmit --watch",
